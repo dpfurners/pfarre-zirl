@@ -6,6 +6,7 @@ import ToastContainer from "react-bootstrap/ToastContainer";
 export type ToastType = "success" | "error" | "warning" | "info" | "primary";
 
 interface ToastMessage {
+  id: number;
   title?: string;
   message: string;
   show: boolean;
@@ -13,8 +14,8 @@ interface ToastMessage {
 }
 
 interface ToastContextType {
-  showToast: (toast: Omit<ToastMessage, "show">) => void;
-  hideToast: () => void;
+  showToast: (toast: Omit<ToastMessage, "show" | "id">) => void;
+  hideToast: (id: number) => void;
   showError: (title: string, message: string) => void;
   showSuccess: (title: string, message: string) => void;
   showPrimary: (title: string, message: string) => void;
@@ -36,17 +37,23 @@ interface ToastProviderProps {
 }
 
 export const ToastProvider = ({ children }: ToastProviderProps) => {
-  const [toast, setToast] = useState<ToastMessage | null>(null);
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   // Generic function to show a toast
-  const showToast = (toastData: Omit<ToastMessage, "show">) => {
-    setToast({ ...toastData, show: true });
+  const showToast = (toastData: Omit<ToastMessage, "show" | "id">) => {
+    const id = Date.now();
+    setToasts((prevToasts) => [...prevToasts, { ...toastData, id, show: true }]);
   };
 
-  const hideToast = () => {
-    setToast((prev) => (prev ? { ...prev, show: false } : null));
-    // Optionally clear the toast after the hide animation
-    setTimeout(() => setToast(null), 300);
+  const hideToast = (id: number) => {
+    setToasts((prevToasts) =>
+      prevToasts.map((toast) =>
+        toast.id === id ? { ...toast, show: false } : toast
+      )
+    );
+    setTimeout(() => {
+      setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
+    }, 300);
   };
 
   // Specialized functions for different toast types
@@ -96,23 +103,24 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
       }}
     >
       {children}
-      <ToastContainer position="bottom-end">
-        {toast && (
+      <ToastContainer position="bottom-end" className="p-3">
+        {toasts.map((toast) => (
           <Toast
-            onClose={hideToast}
+            key={toast.id}
+            onClose={() => hideToast(toast.id)}
             show={toast.show}
             delay={3000}
             autohide
             className={getToastClass(toast.type)}
           >
             {toast.title && (
-              <Toast.Header closeButton={false}>
+              <Toast.Header>
                 <strong className="me-auto">{toast.title}</strong>
               </Toast.Header>
             )}
             <Toast.Body>{toast.message}</Toast.Body>
           </Toast>
-        )}
+        ))}
       </ToastContainer>
     </ToastContext.Provider>
   );

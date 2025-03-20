@@ -1,7 +1,9 @@
+import { Link } from "react-router-dom";
+
 const User = () => {
   return (
     <section>
-      <h1>User</h1>
+      <Link to="/gruppenleiter">Gruppenleiter</Link>
     </section>
   );
 };

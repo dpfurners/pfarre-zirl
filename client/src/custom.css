@@ -7,6 +7,17 @@
     }
   }
 
+html {
+  min-height: 100%;
+  position: relative;
+}
+
+body {
+  margin: 0;
+  padding-bottom: 100px; /* Height of the footer */
+  box-sizing: border-box;
+}
+
 .footer-content {
   position: absolute;
   bottom: 0;

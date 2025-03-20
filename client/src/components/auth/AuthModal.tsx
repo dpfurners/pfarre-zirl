@@ -4,10 +4,10 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import { useLocation, useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
-import axios from "../api/axios";
+import useAuth from "../../hooks/useAuth";
+import axios, { axiosPrivate } from "../../api/axios";
 import { AxiosError } from "axios";
-import { useToast } from "../context/ToastProvider";
+import { useToast } from "../../context/ToastProvider";
 
 const LOGIN_URL = "/auth/login";
 const REGISTER_URL = "/auth/register";
@@ -26,7 +26,7 @@ function Auth({ authRequired }: Props) {
 
   const [showLogin, setShowLogin] = useState(true);
   const [showRegister, setShowRegister] = useState(false);
-  const [email, setEmail] = useState("");
+  const [mail, setMail] = useState("");
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
@@ -48,13 +48,9 @@ function Auth({ authRequired }: Props) {
   ) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
+      const response = await axiosPrivate.post(
         REGISTER_URL,
-        JSON.stringify({ username, password }),
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
+        JSON.stringify({ username, password, mail })
       );
       // TODO: remove console.logs before deployment
       console.log(JSON.stringify(response?.data));
@@ -78,13 +74,9 @@ function Auth({ authRequired }: Props) {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
+      const response = await axiosPrivate.post(
         LOGIN_URL,
-        JSON.stringify({ username, password }),
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
+        JSON.stringify({ username, password })
       );
       console.log(JSON.stringify(response?.data));
       //console.log(JSON.stringify(response));
@@ -93,7 +85,7 @@ function Auth({ authRequired }: Props) {
       setAuth({ username, roles, accessToken });
       setUserName("");
       setPassword("");
-      navigate(from, { replace: true });
+      navigate("/home", { replace: true });
     } catch (err) {
       if (!(err instanceof AxiosError) || !err.response) {
         showError("Login Error", "No Server Response");
@@ -143,8 +135,8 @@ function Auth({ authRequired }: Props) {
                 <Form.Control
                   type="email"
                   placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={mail}
+                  onChange={(e) => setMail(e.target.value)}
                 />
               </FloatingLabel>
             )}

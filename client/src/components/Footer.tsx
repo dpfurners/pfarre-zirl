@@ -7,8 +7,8 @@ function Footer({ appWindowSize }: Props) {
     return (
       <>
         <p>
-          &copy; 2025 Daniel Pfurner |{" "}
-          <a href="mailto:dpfurner@gmail.com">Contact Us</a>
+          &copy; 2025 Jungschaar Zirl
+          {/* {" "}|{" "}<a href="mailto:jungschaar@pfarre.com">Contact Us</a> */}
         </p>
       </>
     );
